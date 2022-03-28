@@ -6,9 +6,13 @@ using System;
 [Serializable]
 public class Employees
 {
-    [SerializeField] ArrayList performanceTrackers;
+    [SerializeField] List<PerformanceTracker> performanceTrackers = new List<PerformanceTracker>();
 
-    public ArrayList GetPerformanceTrackers() {
+    public List<PerformanceTracker> GetPerformanceTrackers() {
         return performanceTrackers;
+    }
+
+    public int printStuff() {
+        return performanceTrackers.Count;
     }
 }

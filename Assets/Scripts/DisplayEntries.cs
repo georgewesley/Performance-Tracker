@@ -6,7 +6,7 @@ using TMPro;
 
 public class DisplayEntries : MonoBehaviour
 {
-    ArrayList entries;
+    List<PerformanceEntry> entries;
 
     [SerializeField] PerformanceTracker tracker;
     [SerializeField] Button button;
@@ -16,8 +16,6 @@ public class DisplayEntries : MonoBehaviour
     {
         entries = tracker.performanceEntries;
         Display();    
-
-
     }
     void Display(){
         GameObject EntryDisplayArea = GetComponentInChildren<VerticalLayoutGroup>().gameObject;

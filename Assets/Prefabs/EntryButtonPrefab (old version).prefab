@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 805234057740083458}
   - component: {fileID: 3707265349069327572}
   m_Layer: 5
-  m_Name: EntryButtonPrefab
+  m_Name: EntryButtonPrefab (old version)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
