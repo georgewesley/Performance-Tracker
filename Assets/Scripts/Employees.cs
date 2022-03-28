@@ -6,9 +6,9 @@ using System;
 [Serializable]
 public class Employees
 {
-    [SerializeField] PerformanceTracker[] performanceTrackers;
+    [SerializeField] ArrayList performanceTrackers;
 
-    public PerformanceTracker[] GetPerformanceTrackers() {
+    public ArrayList GetPerformanceTrackers() {
         return performanceTrackers;
     }
 }

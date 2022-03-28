@@ -6,7 +6,7 @@ using TMPro;
 
 public class DisplayEntries : MonoBehaviour
 {
-    PerformanceEntry[] entries;
+    ArrayList entries;
 
     [SerializeField] PerformanceTracker tracker;
     [SerializeField] Button button;
