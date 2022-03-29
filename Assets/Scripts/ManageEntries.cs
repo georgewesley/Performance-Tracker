@@ -8,12 +8,10 @@ using TMPro;
 public class ManageEntries : MonoBehaviour
 {
     [SerializeField] Button entryButton;
-
     [SerializeField] GameObject ManageTrackersPanel;
-
     [SerializeField] GameObject ManageEntriesPanel;
     [SerializeField] GameObject EntryPanel;
-
+    public PerformanceEntry performanceEntry;
     private ManageTrackers trackerManager;
     private List<PerformanceEntry> performanceEntries;
 
@@ -30,14 +28,18 @@ public class ManageEntries : MonoBehaviour
 
         void DisplayEntries()
     {
-        //should not need to 
+        entryButton.name = "Back";
+        TextMeshProUGUI textMeshPro = entryButton.GetComponentInChildren<TextMeshProUGUI>();
+        textMeshPro.SetText("Go Back");
+        Button newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
+        newButton.onClick.AddListener(() => OnBackPress());
+        newButton.transform.SetParent(DisplayArea.transform);
         foreach (PerformanceEntry entry in performanceEntries)
         {
             Debug.Log("One iteration");
             entryButton.name = entry.category;
-            TextMeshProUGUI textMeshPro = entryButton.GetComponentInChildren<TextMeshProUGUI>();
             textMeshPro.SetText("Category: " + entry.category + "\n" + "Subcategory: " + entry.subcategory + "\n" + "Leader Name: " + entry.leaderName + "\n" + "Date: " + entry.entryDate.Day+"/"+entry.entryDate.Month+"/"+entry.entryDate.Year);
-            Button newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
+            newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
             newButton.onClick.AddListener(() => OnEntryPress(entry));
             // SetEntryText(newButton, entry, entryDisplayTransform);
             newButton.transform.SetParent(DisplayArea.transform);
@@ -47,6 +49,12 @@ public class ManageEntries : MonoBehaviour
     
     void OnEntryPress(PerformanceEntry entry)
     {
+        performanceEntry = entry;
+        EntryPanel.SetActive(true);
+        ManageEntriesPanel.SetActive(false);
+    }
+
+    void OnBackPress() {
         ManageTrackersPanel.SetActive(true); //Temporarily here, will move to back button (that goes back to main menu)
         ManageEntriesPanel.SetActive(false);
         RemoveEntries();

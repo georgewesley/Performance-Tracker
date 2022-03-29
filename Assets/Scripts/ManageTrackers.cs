@@ -12,6 +12,8 @@ public class ManageTrackers : MonoBehaviour
     [SerializeField] Button entryButton;
     [SerializeField] GameObject ManageTrackersPanel;
     [SerializeField] GameObject ManageEntriesPanel;
+    [SerializeField] GameObject MainMenuPanel;
+    [SerializeField] GameObject PerformancePanel;
     public List<PerformanceTracker> performanceTrackers;
 
     public GameObject DisplayArea;
@@ -27,7 +29,7 @@ public class ManageTrackers : MonoBehaviour
             textDescription = "Rogan did a bad job",
             category = "Bad Job",
             subcategory = "real bad job",
-            leaderName = "Wes"
+            leaderName = "Wes'"
         };
         List<PerformanceEntry> l = new List<PerformanceEntry>();
         l.Add(e);
@@ -49,11 +51,17 @@ public class ManageTrackers : MonoBehaviour
 
     }
     void DisplayEmployees(){
+        entryButton.name = "Back";
+        TextMeshProUGUI textMeshPro = entryButton.GetComponentInChildren<TextMeshProUGUI>();
+        textMeshPro.SetText("Go Back");
+        Button newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
+        newButton.onClick.AddListener(() => OnBackPress());
+        newButton.transform.SetParent(DisplayArea.transform);
         foreach(PerformanceTracker tracker in performanceTrackers) {
             button.name = tracker.firstName;
-            TextMeshProUGUI textMeshPro = button.GetComponentInChildren<TextMeshProUGUI>();
+            textMeshPro = button.GetComponentInChildren<TextMeshProUGUI>();
             textMeshPro.SetText(tracker.firstName);
-            Button newButton = Instantiate<Button>(button, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
+            newButton = Instantiate<Button>(button, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
             newButton.onClick.AddListener(() => OnEmployeePress(tracker));
             newButton.transform.SetParent(DisplayArea.transform);
         }
@@ -62,6 +70,10 @@ public class ManageTrackers : MonoBehaviour
         SelectedEmployee = performanceTracker;
         EntryView();
         
+    }
+    void OnBackPress() {
+        MainMenuPanel.SetActive(true); //Temporarily here, will move to back button (that goes back to main menu)
+        PerformancePanel.SetActive(false);
     }
 
     void Save() {
