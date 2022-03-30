@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
+using Google.Apis.Sheets.v4.Data;
 public class ManageTrackers : MonoBehaviour
 {
     public Employees employees;
@@ -22,13 +22,14 @@ public class ManageTrackers : MonoBehaviour
     public PerformanceTracker SelectedEmployee;
     void Start()
     {
-        //Save();
+        Save();
         Load();
-        PerformanceEntry e = new PerformanceEntry() {
+        LoadFromSheets();
+        /*PerformanceEntry e = new PerformanceEntry() {
             entryDate = DateTime.UtcNow,
-            textDescription = "Rogan did a bad job",
+            textDescription = "Test did a bad bad bad job testing testing testing testing testing testing testing",
             category = "Bad Job",
-            subcategory = "real bad job",
+            subcategory = "testing123",
             leaderName = "Wes'"
         };
         List<PerformanceEntry> l = new List<PerformanceEntry>();
@@ -37,13 +38,14 @@ public class ManageTrackers : MonoBehaviour
         l.Add(e);
         performanceTrackers = employees.GetPerformanceTrackers();
         PerformanceTracker p = new PerformanceTracker() {
-            firstName = "Rogan",
+            firstName = "TEST",
             lastName = "Lyon",
             hireDate = DateTime.UtcNow,
             performanceEntries = l
         };
         performanceTrackers.Add(p);
-        Debug.Log(employees.printStuff());
+        Debug.Log(employees.printStuff());*/
+
         DisplayArea = GetComponentInChildren<VerticalLayoutGroup>().gameObject;
         DisplayAreaTransform = DisplayArea.GetComponent<Transform>().position;
         DisplayEmployees();    
@@ -69,9 +71,9 @@ public class ManageTrackers : MonoBehaviour
     void OnEmployeePress(PerformanceTracker performanceTracker) {
         SelectedEmployee = performanceTracker;
         EntryView();
-        
     }
     void OnBackPress() {
+        Save();
         MainMenuPanel.SetActive(true); //Temporarily here, will move to back button (that goes back to main menu)
         PerformancePanel.SetActive(false);
     }
@@ -97,6 +99,39 @@ public class ManageTrackers : MonoBehaviour
     void EntryView() {
         ManageEntriesPanel.SetActive(true);
         ManageTrackersPanel.SetActive(false);
+    }
+
+    void LoadFromSheets()
+    {
+        List<string> notNames = new() { "MASTER Performance Board", "EXAMPLE TRACKER", "*DO NOT USE* Perf Tracker Template", "Copy of *DO NOT USE* Perf Tracker Template", "*DO NOT USE* - LEGEND" };
+        SheetsReader reader = FindObjectOfType<SheetsReader>();
+        //reader.getSheetRange("EXAMPLE TRACKER!E9");
+        string title;
+        string[] fullName;
+        string firstName;
+        string lastName;
+        DateTime hireDate = DateTime.Now;
+        List<PerformanceEntry> performanceEntries = new();
+        foreach (Sheet sheet in reader.GetAllSheets())
+        {
+            title = sheet.Properties.Title;
+            Debug.Log(title);
+            if (!notNames.Contains(title))
+            {
+                try
+                {
+                    Debug.Log(title);
+                    fullName = ((string)reader.getSheetRange(title + "!B3")[0][0]).Split(" ");
+                    firstName = fullName[0];
+                    lastName = fullName[1];
+                    CreateEmployee(firstName, lastName, hireDate, performanceEntries);
+                }
+                catch
+                {
+                    
+                }
+            }
+        }
     }
 
     void CreateEmployee(string firstName, string lastName, DateTime hireDate, List<PerformanceEntry> performanceEntries)
