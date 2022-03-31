@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Google.Apis.Services;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Sheets.v4;
-using Google.Apis.Sheets.v4.Data;
+using Data = Google.Apis.Sheets.v4.Data;
 
 
 using UnityEngine;
@@ -19,8 +19,7 @@ class SheetsReader : MonoBehaviour
     static SheetsReader()
     {
         //  Loading private key from resources as a TextAsset
-        string key = "This is where one would put their key, will not upload it to github for obvious reasons";
-        Debug.Log(key);
+        string key = "INSERT KEY HERE";
 
         // Creating a  ServiceAccountCredential.Initializer
         // ref: https://googleapis.dev/dotnet/Google.Apis.Auth/latest/api/Google.Apis.Auth.OAuth2.ServiceAccountCredential.Initializer.html
@@ -38,17 +37,16 @@ class SheetsReader : MonoBehaviour
                 HttpClientInitializer = credential,
             }
         );
-        Debug.Log("Tried to do sheets stuff in static");
     }
 
-    public IList<IList<object>> getSheetRange(string sheetNameAndRange)
+    public IList<Data.ValueRange> getSheetRange(List<string> sheetNameAndRange)
     {
-        SpreadsheetsResource.ValuesResource.GetRequest request = service.Spreadsheets.Values.Get(spreadsheetId, sheetNameAndRange);
-        ValueRange response = request.Execute();
-        IList<IList<object>> values = response.Values;
-        if (values != null && values.Count > 0)
+        SpreadsheetsResource.ValuesResource.BatchGetRequest request = service.Spreadsheets.Values.BatchGet(spreadsheetId);
+        request.Ranges = sheetNameAndRange;
+        Data.BatchGetValuesResponse response = request.Execute();
+        if (response != null && response.ValueRanges.Count > 0)
         {
-            return values;
+            return response.ValueRanges; //[0].Values of this returns the values of first range
         }
         else
         {
@@ -57,8 +55,28 @@ class SheetsReader : MonoBehaviour
         }
     }
 
-    public IList<Sheet> GetAllSheets()
+    public List<string> GetNames() {
+        List<string> names = new();
+        List<string> range = new();
+        range.Add("MASTER Performance Board!A12:A999");
+        range.Add("MASTER Performance Board!I12:I999");
+        int i = 0;
+        IList<Data.ValueRange> ranges = getSheetRange(range);
+        foreach (IList<object> row in ranges[0].Values) {
+            //Debug.Log((string)row[0]);
+            //Debug.Log(ranges[1].Values[i][0]);
+            //Debug.Log((string)ranges[1].Values[i][0] == "Active "); //there is space in active for whatever reason
+            if ((string) ranges[1].Values[i][0] == "Active "){//HR Status
+                names.Add((string)row[0]);
+            } 
+            i++;
+        }
+        return names;
+    }
+
+    public IList<Data.Sheet> GetAllSheets() // This is a bit extreme, will take forever. Do not reccomend using
     {
-        return service.Spreadsheets.Get(spreadsheetId).Execute().Sheets;
+        return null;
+        //return service.Spreadsheets.Get(spreadsheetId).Execute().Sheets;
     }
 }

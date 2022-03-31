@@ -9,6 +9,7 @@ public class PerformanceTracker
 {
     public string firstName;
     public string lastName;// {get; set;}
+    public string sheetName;
     public DateTime hireDate; //{get; set;}
     public List<PerformanceEntry> performanceEntries;//{get; set;}
 

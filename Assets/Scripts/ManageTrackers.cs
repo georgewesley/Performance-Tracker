@@ -22,31 +22,9 @@ public class ManageTrackers : MonoBehaviour
     public PerformanceTracker SelectedEmployee;
     void Start()
     {
-        Save();
-        Load();
         LoadFromSheets();
-        /*PerformanceEntry e = new PerformanceEntry() {
-            entryDate = DateTime.UtcNow,
-            textDescription = "Test did a bad bad bad job testing testing testing testing testing testing testing",
-            category = "Bad Job",
-            subcategory = "testing123",
-            leaderName = "Wes'"
-        };
-        List<PerformanceEntry> l = new List<PerformanceEntry>();
-        l.Add(e);
-        l.Add(e);
-        l.Add(e);
-        performanceTrackers = employees.GetPerformanceTrackers();
-        PerformanceTracker p = new PerformanceTracker() {
-            firstName = "TEST",
-            lastName = "Lyon",
-            hireDate = DateTime.UtcNow,
-            performanceEntries = l
-        };
-        performanceTrackers.Add(p);
-        Debug.Log(employees.printStuff());*/
 
-        DisplayArea = GetComponentInChildren<VerticalLayoutGroup>().gameObject;
+        DisplayArea = GetComponentInChildren<GridLayoutGroup>().gameObject;
         DisplayAreaTransform = DisplayArea.GetComponent<Transform>().position;
         DisplayEmployees();    
 
@@ -73,27 +51,9 @@ public class ManageTrackers : MonoBehaviour
         EntryView();
     }
     void OnBackPress() {
-        Save();
+        //Save();
         MainMenuPanel.SetActive(true); //Temporarily here, will move to back button (that goes back to main menu)
         PerformancePanel.SetActive(false);
-    }
-
-    void Save() {
-        string save = JsonUtility.ToJson(employees);
-        System.IO.File.WriteAllText(Application.persistentDataPath + "/EmployeeData.json", save);
-    }
-    void Load() {
-        try
-        {
-            string load = System.IO.File.ReadAllText(Application.persistentDataPath + "/EmployeeData.json");
-            employees = JsonUtility.FromJson<Employees>(load);
-        }
-        catch
-        {
-            //create JSON file
-            Debug.Log("We failed");
-            Save();
-        }
     }
 
     void EntryView() {
@@ -103,47 +63,56 @@ public class ManageTrackers : MonoBehaviour
 
     void LoadFromSheets()
     {
-        List<string> notNames = new() { "MASTER Performance Board", "EXAMPLE TRACKER", "*DO NOT USE* Perf Tracker Template", "Copy of *DO NOT USE* Perf Tracker Template", "*DO NOT USE* - LEGEND" };
         SheetsReader reader = FindObjectOfType<SheetsReader>();
         //reader.getSheetRange("EXAMPLE TRACKER!E9");
-        string title;
         string[] fullName;
         string firstName;
         string lastName;
         DateTime hireDate = DateTime.Now;
         List<PerformanceEntry> performanceEntries = new();
-        foreach (Sheet sheet in reader.GetAllSheets())
+        foreach (string name in reader.GetNames())
         {
-            title = sheet.Properties.Title;
-            Debug.Log(title);
-            if (!notNames.Contains(title))
+            try
             {
-                try
-                {
-                    Debug.Log(title);
-                    fullName = ((string)reader.getSheetRange(title + "!B3")[0][0]).Split(" ");
-                    firstName = fullName[0];
-                    lastName = fullName[1];
-                    CreateEmployee(firstName, lastName, hireDate, performanceEntries);
-                }
-                catch
-                {
-                    
-                }
+                Debug.Log(name);
+                fullName = name.Split(" ");
+                firstName = fullName[0];
+                lastName = fullName[1];
+                CreateEmployee(firstName, lastName, name, hireDate, performanceEntries);
             }
+            catch{}
         }
     }
 
-    void CreateEmployee(string firstName, string lastName, DateTime hireDate, List<PerformanceEntry> performanceEntries)
+    void CreateEmployee(string firstName, string lastName, string sheetName, DateTime hireDate, List<PerformanceEntry> performanceEntries)
     {
         PerformanceTracker employee = new PerformanceTracker()
         {
             firstName = firstName, 
             lastName = lastName,
+            sheetName = sheetName,
             hireDate = hireDate,
             performanceEntries = performanceEntries
         };
         performanceTrackers.Add(employee);
-        Save();
+        //Save();
     }
 }
+
+    // void Save() {
+    //     string save = JsonUtility.ToJson(employees);
+    //     System.IO.File.WriteAllText(Application.persistentDataPath + "/EmployeeData.json", save);
+    // }
+    // void Load() {
+    //     try
+    //     {
+    //         string load = System.IO.File.ReadAllText(Application.persistentDataPath + "/EmployeeData.json");
+    //         employees = JsonUtility.FromJson<Employees>(load);
+    //     }
+    //     catch
+    //     {
+    //         //create JSON file
+    //         Debug.Log("We failed");
+    //         Save();
+    //     }
+    // }

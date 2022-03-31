@@ -14,17 +14,18 @@ public class ManageEntries : MonoBehaviour
     public PerformanceEntry performanceEntry;
     private ManageTrackers trackerManager;
     private List<PerformanceEntry> performanceEntries;
-
+    private PerformanceTracker selectedEmployee;
     private GameObject DisplayArea;
     private Vector3 DisplayAreaTransform;
     void OnEnable() //if we used start this would happen before trackerManger is even ready to be called
     {
-        DisplayArea = GetComponentInChildren<VerticalLayoutGroup>().gameObject;
+        DisplayArea = GetComponentInChildren<GridLayoutGroup>().gameObject;
         DisplayAreaTransform = DisplayArea.GetComponent<Transform>().position;
         if(DisplayArea.transform.childCount==0)
         {
             trackerManager = FindObjectOfType<ManageTrackers>();
-            performanceEntries = trackerManager.SelectedEmployee.performanceEntries;
+            selectedEmployee = trackerManager.SelectedEmployee;
+            performanceEntries = CreatePerformanceEntries();
             DisplayEntries();
         }
        
@@ -40,9 +41,9 @@ public class ManageEntries : MonoBehaviour
         newButton.transform.SetParent(DisplayArea.transform);
         foreach (PerformanceEntry entry in performanceEntries)
         {
-            Debug.Log("One iteration");
             entryButton.name = entry.category;
-            textMeshPro.SetText("Category: " + entry.category + "\n" + "Subcategory: " + entry.subcategory + "\n" + "Leader Name: " + entry.leaderName + "\n" + "Date: " + entry.entryDate.Day+"/"+entry.entryDate.Month+"/"+entry.entryDate.Year);
+            textMeshPro.SetText("Category: " + entry.category + "\n" + "Subcategory: " + entry.subcategory + "\n" + "Leader Name: " + entry.leaderName + "\n" + "Date: " + entry.entryDate.Day+"/"+entry.entryDate.Month+"/"+entry.entryDate.Year
+            + "\n\n" + entry.textDescription);
             newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
             newButton.onClick.AddListener(() => OnEntryPress(entry));
             // SetEntryText(newButton, entry, entryDisplayTransform);
@@ -67,5 +68,24 @@ public class ManageEntries : MonoBehaviour
     void RemoveEntries() { 
         for (int i = 0; i < DisplayArea.transform.childCount; i++)
              Destroy(DisplayArea.transform.GetChild(i).gameObject);
+    }
+
+    List<PerformanceEntry> CreatePerformanceEntries() { //This is worse design than CreateEmployee from ManageTrackers. Will change to that style later.
+        List<PerformanceEntry> entries = new();
+        SheetsReader reader = FindObjectOfType<SheetsReader>();
+        List<string> range = new();
+        range.Add(selectedEmployee.sheetName+"!A9:F990");
+        IList<IList<object>> iterate = reader.getSheetRange(range)[0].Values;
+        foreach(IList<object> row in iterate) {
+            PerformanceEntry entry = new() {
+                entryDate = DateTime.Parse((string)row[0]), 
+                textDescription = (string)row[4],
+                category = (string)row[2],
+                subcategory = (string)row[3],
+                leaderName = (string)row[1]
+            };
+            entries.Add(entry);
+        }
+        return entries;
     }
 }
