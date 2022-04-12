@@ -15,11 +15,9 @@ public class ManageTrackers : MonoBehaviour
     [SerializeField] GameObject MainMenuPanel;
     [SerializeField] GameObject PerformancePanel;
     public List<PerformanceTracker> performanceTrackers;
-
     public GameObject DisplayArea;
     public Vector3 DisplayAreaTransform;
-
-    public PerformanceTracker SelectedEmployee;
+    public static PerformanceTracker SelectedEmployee;
     void Start()
     {
         LoadFromSheets();
@@ -78,7 +76,7 @@ public class ManageTrackers : MonoBehaviour
                 fullName = name.Split(" ");
                 firstName = fullName[0];
                 lastName = fullName[1];
-                CreateEmployee(firstName, lastName, name, hireDate, performanceEntries);
+                CreateEmployee(firstName, lastName, name.Trim(), hireDate, performanceEntries);
             }
             catch{}
         }

@@ -188,7 +188,18 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Go Back
+  m_text: 'Category: Tardy/Absent (Schedule)
+
+    Subcategory: Absent - No Show
+
+    Leader
+    Name: Amina Omar
+
+    Date: 2/4/2022
+
+
+    Aysia did ot show up for her shift
+    today. No message was sent'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

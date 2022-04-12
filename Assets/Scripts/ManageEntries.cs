@@ -11,7 +11,7 @@ public class ManageEntries : MonoBehaviour
     [SerializeField] GameObject ManageTrackersPanel;
     [SerializeField] GameObject ManageEntriesPanel;
     [SerializeField] GameObject EntryPanel;
-    public PerformanceEntry performanceEntry;
+    public PerformanceEntry selectedPerformanceEntry;
     private ManageTrackers trackerManager;
     private List<PerformanceEntry> performanceEntries;
     private PerformanceTracker selectedEmployee;
@@ -23,8 +23,7 @@ public class ManageEntries : MonoBehaviour
         DisplayAreaTransform = DisplayArea.GetComponent<Transform>().position;
         if(DisplayArea.transform.childCount==0)
         {
-            trackerManager = FindObjectOfType<ManageTrackers>();
-            selectedEmployee = trackerManager.SelectedEmployee;
+            selectedEmployee = ManageTrackers.SelectedEmployee;
             performanceEntries = CreatePerformanceEntries();
             DisplayEntries();
         }
@@ -54,7 +53,7 @@ public class ManageEntries : MonoBehaviour
     
     void OnEntryPress(PerformanceEntry entry)
     {
-        performanceEntry = entry;
+        selectedPerformanceEntry = entry;
         EntryPanel.SetActive(true);
         ManageEntriesPanel.SetActive(false);
     }
@@ -74,18 +73,41 @@ public class ManageEntries : MonoBehaviour
         List<PerformanceEntry> entries = new();
         SheetsReader reader = FindObjectOfType<SheetsReader>();
         List<string> range = new();
+        DateTime date = new();
         range.Add(selectedEmployee.sheetName+"!A9:F990");
         IList<IList<object>> iterate = reader.getSheetRange(range)[0].Values;
+        int count = 9; //represents what row we are in, starts at 9 because that is the row above that we start at
         foreach(IList<object> row in iterate) {
+            List<string> validRow = ValidateRow(row);
+            try {
+                date = DateTime.Parse((string)validRow[0]);
+            }
+            catch{
+                date = DateTime.MaxValue;
+            }
             PerformanceEntry entry = new() {
-                entryDate = DateTime.Parse((string)row[0]), 
-                textDescription = (string)row[4],
-                category = (string)row[2],
-                subcategory = (string)row[3],
-                leaderName = (string)row[1]
+                entryDate = date, 
+                textDescription = (string)validRow[4],
+                category = (string)validRow[2],
+                subcategory = (string)validRow[3],
+                leaderName = (string)validRow[1],
+                row = count
             };
+            count += 1;
             entries.Add(entry);
         }
         return entries;
+    }
+    List<string> ValidateRow(IList<object> row) {
+        List<string> validList = new();
+        for (int i = 0; i<5; i++) {
+            try {
+                validList.Add((string) row[i]);
+            }
+            catch {
+                validList.Add("No E");
+            }
+        }
+        return validList;
     }
 }

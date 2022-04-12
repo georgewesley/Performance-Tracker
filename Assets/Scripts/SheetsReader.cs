@@ -74,9 +74,11 @@ class SheetsReader : MonoBehaviour
         return names;
     }
 
-    public IList<Data.Sheet> GetAllSheets() // This is a bit extreme, will take forever. Do not reccomend using
-    {
-        return null;
-        //return service.Spreadsheets.Get(spreadsheetId).Execute().Sheets;
+    public void WriteToRange(string sheetNameAndRange, Data.ValueRange writeText) {
+        SpreadsheetsResource.ValuesResource.UpdateRequest request = service.Spreadsheets.Values.Update(writeText, spreadsheetId, sheetNameAndRange);
+        SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum valueInputOption = (SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum) 1;
+        request.ValueInputOption = valueInputOption;
+        Data.UpdateValuesResponse response = request.Execute();
+        //service.Spreadsheets.Values.Update(writeText, spreadsheetId, sheetNameAndRange).Execute();
     }
 }

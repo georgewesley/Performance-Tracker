@@ -7,9 +7,10 @@ using System;
 [Serializable]
 public class PerformanceEntry
 {
-    public DateTime entryDate;//{get; set;}
-    public string textDescription;//{get; set;}
-    public string category;//{get; set;}
-    public string subcategory;//{get; set;}
-    public string leaderName;//{get; set;}
+    public DateTime entryDate;
+    public string textDescription;
+    public string category;
+    public string subcategory;
+    public string leaderName;
+    public int row;
 }

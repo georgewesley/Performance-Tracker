@@ -30,7 +30,7 @@ public class DisplayEntry : MonoBehaviour
         description.transform.SetPositionAndRotation(new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
         description.transform.SetParent(DisplayArea.transform);
         TextMeshProUGUI descriptionText = description.AddComponent<TextMeshProUGUI>();
-        descriptionText.SetText(FindObjectOfType<ManageEntries>().performanceEntry.textDescription);
+        descriptionText.SetText(FindObjectOfType<ManageEntries>().selectedPerformanceEntry.textDescription);
         descriptionText.fontSize = 72;
         descriptionText.rectTransform.sizeDelta = new Vector2(1500, 0);
     }
