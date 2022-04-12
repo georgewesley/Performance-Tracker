@@ -188,18 +188,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Category: Tardy/Absent (Schedule)
-
-    Subcategory: Absent - No Show
-
-    Leader
-    Name: Amina Omar
-
-    Date: 2/4/2022
-
-
-    Aysia did ot show up for her shift
-    today. No message was sent'
+  m_text: "Category: Progressive Disciplinary Process\nSubcategory: Suspension\nLeader
+    Name: GD - Gary Hudson \nDate: 31/3/2022\n\nAnthony came in late again this morning,
+    he said he had to pick up his grandma from the airport, but did not communicate
+    with leadership about this last minute late. As a result, he has been suspended
+    for the following scheduled week. Leticia and I spoke with him, and he signed
+    his write up."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
