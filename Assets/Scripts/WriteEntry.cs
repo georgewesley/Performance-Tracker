@@ -19,7 +19,8 @@ public class WriteEntry : MonoBehaviour
     void OnEnable()
     {
         performanceEntry = FindObjectOfType<ManageEntries>().selectedPerformanceEntry;
-        WriteEntryPanel.GetComponentInChildren<Button>().onClick.AddListener(() => SaveFields());
+        WriteEntryPanel.transform.Find("Save Button").GetComponent<Button>().onClick.AddListener(() => SaveFields());
+        WriteEntryPanel.transform.Find("Back Button").GetComponent<Button>().onClick.AddListener(() => OnBackPress());
         FillFields();
     }
 
@@ -64,6 +65,10 @@ public class WriteEntry : MonoBehaviour
         string sheetName = ManageTrackers.SelectedEmployee.sheetName;
         string row = performanceEntry.row.ToString();
         return sheetName+"!"+"A"+row+":"+"E"+row;
+    }
+    void OnBackPress() {
+        ManageEntryPanel.SetActive(true);
+        WriteEntryPanel.SetActive(false);
     }
 }
 
