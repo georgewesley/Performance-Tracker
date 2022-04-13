@@ -14,6 +14,7 @@ public class ManageTrackers : MonoBehaviour
     [SerializeField] GameObject ManageEntriesPanel;
     [SerializeField] GameObject MainMenuPanel;
     [SerializeField] GameObject PerformancePanel;
+    [SerializeField] GameObject GenerateEmployeePanel;
     public List<PerformanceTracker> performanceTrackers;
     public GameObject DisplayArea;
     public Vector3 DisplayAreaTransform;
@@ -31,20 +32,27 @@ public class ManageTrackers : MonoBehaviour
     void DisplayEmployees(){
         entryButton.name = "Back";
         TextMeshProUGUI textMeshPro = entryButton.GetComponentInChildren<TextMeshProUGUI>();
+        TextMeshProUGUI trackerTextMeshPro;
         textMeshPro.SetText("Go Back");
         Button newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
         newButton.onClick.AddListener(() => OnBackPress());
         newButton.transform.SetParent(DisplayArea.transform);
         foreach(PerformanceTracker tracker in performanceTrackers) {
             button.name = tracker.firstName;
-            textMeshPro = button.GetComponentInChildren<TextMeshProUGUI>();
-            textMeshPro.SetText(tracker.firstName);
+            trackerTextMeshPro = button.GetComponentInChildren<TextMeshProUGUI>();
+            trackerTextMeshPro.SetText(tracker.firstName);
             newButton = Instantiate<Button>(button, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
             newButton.onClick.AddListener(() => OnEmployeePress(tracker));
             newButton.transform.SetParent(DisplayArea.transform);
         }
+        entryButton.name = "New Employee";
+        textMeshPro.SetText("Create New Employee");
+        newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
+        newButton.onClick.AddListener(() => CreateEmployeePress());
+        newButton.transform.SetParent(DisplayArea.transform);
     }
     void OnEmployeePress(PerformanceTracker performanceTracker) {
+        Debug.Log("We did wrong thing");
         SelectedEmployee = performanceTracker;
         EntryView();
     }
@@ -54,15 +62,21 @@ public class ManageTrackers : MonoBehaviour
         PerformancePanel.SetActive(false);
     }
 
+    void CreateEmployeePress()
+    {
+        Debug.Log("We did correct thing");
+        GenerateEmployeePanel.SetActive(true);
+        ManageTrackersPanel.SetActive(false);
+    }
+
     void EntryView() {
         ManageEntriesPanel.SetActive(true);
         ManageTrackersPanel.SetActive(false);
     }
-
+    
     void LoadFromSheets()
     {
         SheetsReader reader = FindObjectOfType<SheetsReader>();
-        //reader.getSheetRange("EXAMPLE TRACKER!E9");
         string[] fullName;
         string firstName;
         string lastName;

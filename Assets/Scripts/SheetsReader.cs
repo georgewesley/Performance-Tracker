@@ -81,4 +81,21 @@ class SheetsReader : MonoBehaviour
         Data.UpdateValuesResponse response = request.Execute();
         //service.Spreadsheets.Values.Update(writeText, spreadsheetId, sheetNameAndRange).Execute();
     }
+
+    public void AddTabToGoogleSheet(String tabName) {
+        var duplicateSheetRequest = new Data.DuplicateSheetRequest();
+        duplicateSheetRequest.SourceSheetId = 318664475;
+        duplicateSheetRequest.NewSheetName = tabName;
+        Data.BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new Data.BatchUpdateSpreadsheetRequest();
+        batchUpdateSpreadsheetRequest.Requests = new List<Data.Request>();
+        batchUpdateSpreadsheetRequest.Requests.Add(new Data.Request
+        {
+            DuplicateSheet = duplicateSheetRequest
+        });
+
+        var batchUpdateRequest =
+            service.Spreadsheets.BatchUpdate(batchUpdateSpreadsheetRequest, spreadsheetId);
+
+        batchUpdateRequest.Execute();
+    }
 }

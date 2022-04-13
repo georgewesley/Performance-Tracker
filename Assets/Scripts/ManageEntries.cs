@@ -34,20 +34,37 @@ public class ManageEntries : MonoBehaviour
     {
         entryButton.name = "Back";
         TextMeshProUGUI textMeshPro = entryButton.GetComponentInChildren<TextMeshProUGUI>();
+        TextMeshProUGUI textMeshProEntry = entryButton.GetComponentInChildren<TextMeshProUGUI>();
         textMeshPro.SetText("Go Back");
         Button newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
         newButton.onClick.AddListener(() => OnBackPress());
         newButton.transform.SetParent(DisplayArea.transform);
+
+        int count = 8; //starts at 8 because 9 is where the rows start on the performance tracker and we do + 1 down below. So in the case where there are 0 current rows we want it to be 8+1. 
         foreach (PerformanceEntry entry in performanceEntries)
         {
             entryButton.name = entry.category;
-            textMeshPro.SetText("Category: " + entry.category + "\n" + "Subcategory: " + entry.subcategory + "\n" + "Leader Name: " + entry.leaderName + "\n" + "Date: " + entry.entryDate.Day+"/"+entry.entryDate.Month+"/"+entry.entryDate.Year
+            textMeshProEntry.SetText("Category: " + entry.category + "\n" + "Subcategory: " + entry.subcategory + "\n" + "Leader Name: " + entry.leaderName + "\n" + "Date: " + entry.entryDate.Day+"/"+entry.entryDate.Month+"/"+entry.entryDate.Year
             + "\n\n" + entry.textDescription);
             newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
             newButton.onClick.AddListener(() => OnEntryPress(entry));
             // SetEntryText(newButton, entry, entryDisplayTransform);
             newButton.transform.SetParent(DisplayArea.transform);
+            count += 1;
         }
+        textMeshPro.SetText("New Entry");
+        newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
+        PerformanceEntry performanceEntry = new()
+        {
+            entryDate = DateTime.Now,
+            textDescription = "",
+            category = "",
+            subcategory = "",
+            leaderName = "",
+            row = count+1
+        };
+        newButton.onClick.AddListener(() => OnEntryPress(performanceEntry));
+        newButton.transform.SetParent(DisplayArea.transform);
     }
 
     
@@ -76,7 +93,11 @@ public class ManageEntries : MonoBehaviour
         DateTime date = new();
         range.Add(selectedEmployee.sheetName+"!A9:F990");
         IList<IList<object>> iterate = reader.getSheetRange(range)[0].Values;
-        int count = 9; //represents what row we are in, starts at 9 because that is the row above that we start at
+        int count = 9; //represents what row we are in, starts at 9 because that is the row above that we start at (on the sheet)
+        if(iterate is null)
+        {
+            return entries;
+        }
         foreach(IList<object> row in iterate) {
             List<string> validRow = ValidateRow(row);
             try {
