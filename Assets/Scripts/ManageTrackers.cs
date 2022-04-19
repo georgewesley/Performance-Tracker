@@ -26,8 +26,6 @@ public class ManageTrackers : MonoBehaviour
         DisplayArea = GetComponentInChildren<GridLayoutGroup>().gameObject;
         DisplayAreaTransform = DisplayArea.GetComponent<Transform>().position;
         DisplayEmployees();    
-
-
     }
     void DisplayEmployees(){
         entryButton.name = "Back";
@@ -36,23 +34,26 @@ public class ManageTrackers : MonoBehaviour
         textMeshPro.SetText("Go Back");
         Button newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
         newButton.onClick.AddListener(() => OnBackPress());
-        newButton.transform.SetParent(DisplayArea.transform);
-        foreach(PerformanceTracker tracker in performanceTrackers) {
+        newButton.transform.SetParent(DisplayArea.transform, false);
+        foreach(PerformanceTracker tracker in performanceTrackers) { //should create a method 
             button.name = tracker.firstName;
             trackerTextMeshPro = button.GetComponentInChildren<TextMeshProUGUI>();
-            trackerTextMeshPro.SetText(tracker.firstName);
+            string buttonName = tracker.firstName;
+            if (tracker.lastName != "") { //if no last name indexing will create an error; indexing empty string is an error
+                buttonName = buttonName + " " + tracker.lastName[0];
+            }
+            trackerTextMeshPro.SetText(buttonName);
             newButton = Instantiate<Button>(button, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
             newButton.onClick.AddListener(() => OnEmployeePress(tracker));
-            newButton.transform.SetParent(DisplayArea.transform);
+            newButton.transform.SetParent(DisplayArea.transform, false);
         }
         entryButton.name = "New Employee";
         textMeshPro.SetText("Create New Employee");
         newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
         newButton.onClick.AddListener(() => CreateEmployeePress());
-        newButton.transform.SetParent(DisplayArea.transform);
+        newButton.transform.SetParent(DisplayArea.transform, false);
     }
     void OnEmployeePress(PerformanceTracker performanceTracker) {
-        Debug.Log("We did wrong thing");
         SelectedEmployee = performanceTracker;
         EntryView();
     }
@@ -79,17 +80,18 @@ public class ManageTrackers : MonoBehaviour
         SheetsReader reader = FindObjectOfType<SheetsReader>();
         string[] fullName;
         string firstName;
-        string lastName;
+        string lastName = "";
         DateTime hireDate = DateTime.Now;
         List<PerformanceEntry> performanceEntries = new();
-        foreach (string name in reader.GetNames())
+        foreach (string name in reader.GetNames()[0])
         {
             try
             {
-                Debug.Log(name);
                 fullName = name.Split(" ");
                 firstName = fullName[0];
-                lastName = fullName[1];
+                if(fullName.Length-1 != 0) { 
+                    lastName = fullName[fullName.Length-1]; //if they only have one name this will be the same as first name
+                } 
                 CreateEmployee(firstName, lastName, name.Trim(), hireDate, performanceEntries);
             }
             catch{}
@@ -108,6 +110,33 @@ public class ManageTrackers : MonoBehaviour
         };
         performanceTrackers.Add(employee);
         //Save();
+    }
+
+    public void AddNewEmployeeAfterLoad(string name) {
+        string[] fullName = name.Split(" ");
+        string firstName = fullName[0];
+        string lastName = "";
+        List<PerformanceEntry> performanceEntries = new();
+        if(fullName.Length-1 != 0) { 
+            lastName = fullName[fullName.Length-1]; //if they only have one name this will be the same as first name
+        } 
+        CreateEmployee(firstName, lastName, name.Trim(), DateTime.Now, performanceEntries); 
+        DisplayNewEmployee();
+    }
+
+    private void DisplayNewEmployee() {
+        PerformanceTracker newTracker = performanceTrackers[performanceTrackers.Count-1];
+        Button newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
+        button.name = newTracker.firstName;
+        TextMeshProUGUI trackerTextMeshPro = button.GetComponentInChildren<TextMeshProUGUI>();
+        string buttonName = newTracker.firstName;
+        if (newTracker.lastName != "") { //if no last name indexing will create an error; indexing empty string is an error
+            buttonName = buttonName + " " + newTracker.lastName[0];
+        }
+        trackerTextMeshPro.SetText(buttonName);
+        newButton = Instantiate<Button>(button, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
+        newButton.onClick.AddListener(() => OnEmployeePress(newTracker));
+        newButton.transform.SetParent(DisplayArea.transform, false);
     }
 }
 

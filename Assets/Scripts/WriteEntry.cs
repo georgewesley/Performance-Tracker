@@ -33,12 +33,12 @@ public class WriteEntry : MonoBehaviour
     }
 
     void SaveFields() {
-        Debug.Log(inputFields[4].GetComponent<TMP_InputField>().text);
+        //Debug.Log(inputFields[4].GetComponent<TMP_InputField>().text);
         SheetsReader writer = FindObjectOfType<SheetsReader>();
         Data.ValueRange body = new Data.ValueRange();
         body.Range = GenerateSheetRange();
         body.Values = GenerateValues(); // this does not happen because values does not have a value
-        Debug.Log(body.Values[0][4]);
+        //Debug.Log(body.Values[0][4]);
         writer.WriteToRange(GenerateSheetRange(), body);
     }
 

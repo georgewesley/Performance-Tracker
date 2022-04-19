@@ -38,7 +38,7 @@ public class ManageEntries : MonoBehaviour
         textMeshPro.SetText("Go Back");
         Button newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
         newButton.onClick.AddListener(() => OnBackPress());
-        newButton.transform.SetParent(DisplayArea.transform);
+        newButton.transform.SetParent(DisplayArea.transform, false); //false is needed here or the canvas scaler will not be used
 
         int count = 8; //starts at 8 because 9 is where the rows start on the performance tracker and we do + 1 down below. So in the case where there are 0 current rows we want it to be 8+1. 
         foreach (PerformanceEntry entry in performanceEntries)
@@ -49,7 +49,7 @@ public class ManageEntries : MonoBehaviour
             newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
             newButton.onClick.AddListener(() => OnEntryPress(entry));
             // SetEntryText(newButton, entry, entryDisplayTransform);
-            newButton.transform.SetParent(DisplayArea.transform);
+            newButton.transform.SetParent(DisplayArea.transform, false);
             count += 1;
         }
         textMeshPro.SetText("New Entry");
@@ -64,7 +64,7 @@ public class ManageEntries : MonoBehaviour
             row = count+1
         };
         newButton.onClick.AddListener(() => OnEntryPress(performanceEntry));
-        newButton.transform.SetParent(DisplayArea.transform);
+        newButton.transform.SetParent(DisplayArea.transform, false);
     }
 
     
@@ -126,7 +126,7 @@ public class ManageEntries : MonoBehaviour
                 validList.Add((string) row[i]);
             }
             catch {
-                validList.Add("No E");
+                validList.Add("No Entry");
             }
         }
         return validList;

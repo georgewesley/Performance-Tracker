@@ -55,11 +55,14 @@ class SheetsReader : MonoBehaviour
         }
     }
 
-    public List<string> GetNames() {
+    public List<List<string>> GetNames() {
+        List<List<string>> nameList = new();
         List<string> names = new();
+        List<string> inactiveNames = new();
+
         List<string> range = new();
-        range.Add("MASTER Performance Board!A12:A999");
-        range.Add("MASTER Performance Board!I12:I999");
+        range.Add("MASTER Performance Board!A3:A999");
+        range.Add("MASTER Performance Board!I3:I999");
         int i = 0;
         IList<Data.ValueRange> ranges = getSheetRange(range);
         foreach (IList<object> row in ranges[0].Values) {
@@ -69,20 +72,29 @@ class SheetsReader : MonoBehaviour
             if ((string) ranges[1].Values[i][0] == "Active "){//HR Status
                 names.Add((string)row[0]);
             } 
+            else {
+                inactiveNames.Add((string)row[0]);
+            }
             i++;
         }
-        return names;
+        nameList.Add(names);
+        nameList.Add(inactiveNames);
+        return nameList;
     }
 
-    public void WriteToRange(string sheetNameAndRange, Data.ValueRange writeText) {
+    public void WriteToRange(string sheetNameAndRange, Data.ValueRange writeText, bool UserEntered = false) { //User entered being true will result in the values being parsed, things like formulas will be applied if this is the case
+        int ValueInput = 1;
+        if(UserEntered) {
+            ValueInput = 2;
+        }
         SpreadsheetsResource.ValuesResource.UpdateRequest request = service.Spreadsheets.Values.Update(writeText, spreadsheetId, sheetNameAndRange);
-        SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum valueInputOption = (SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum) 1;
+        SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum valueInputOption = (SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum) ValueInput;
         request.ValueInputOption = valueInputOption;
         Data.UpdateValuesResponse response = request.Execute();
         //service.Spreadsheets.Values.Update(writeText, spreadsheetId, sheetNameAndRange).Execute();
     }
 
-    public void AddTabToGoogleSheet(String tabName) {
+    public string AddTabToGoogleSheet(String tabName) { //returns sheet id of new tab
         var duplicateSheetRequest = new Data.DuplicateSheetRequest();
         duplicateSheetRequest.SourceSheetId = 318664475;
         duplicateSheetRequest.NewSheetName = tabName;
@@ -92,10 +104,12 @@ class SheetsReader : MonoBehaviour
         {
             DuplicateSheet = duplicateSheetRequest
         });
-
         var batchUpdateRequest =
             service.Spreadsheets.BatchUpdate(batchUpdateSpreadsheetRequest, spreadsheetId);
+        return batchUpdateRequest.Execute().Replies[0].DuplicateSheet.Properties.SheetId.ToString();
+    }
 
-        batchUpdateRequest.Execute();
+    public string GetSpreadSheetId() {
+        return spreadsheetId;
     }
 }
