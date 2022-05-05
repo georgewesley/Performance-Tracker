@@ -9,14 +9,38 @@ public class CreateNewEmployee : MonoBehaviour
     [SerializeField] GameObject CreateNewEmployeePanel;
     [SerializeField] GameObject[] inputFields;
     private SheetsReader writer;
-    private TMP_InputField name;
+    private TMP_InputField employeeName;
+    private TMP_InputField employeeEmail;
+    private TMP_InputField employeePhone;
+    private TMP_InputField employeeInfo;
+    private TMP_InputField employeeType;
+    private TMP_InputField employeeHouse;
+    private TMP_InputField employeeTeam;
+    private TMP_InputField employeeRole;
+    private TMP_InputField employeeStatus;
     private TMP_InputField hireDate;
     private void OnEnable()
     {
         writer = FindObjectOfType<SheetsReader>();
-        name = inputFields[0].GetComponent<TMP_InputField>();
-        name.text = "";
-        hireDate = inputFields[1].GetComponent<TMP_InputField>();
+        employeeName = inputFields[0].GetComponent<TMP_InputField>();
+        employeeName.text = "";
+        employeeEmail = inputFields[1].GetComponent<TMP_InputField>();
+        employeeEmail.text = "";
+        employeePhone = inputFields[2].GetComponent<TMP_InputField>();
+        employeePhone.text = "";
+        employeeInfo = inputFields[3].GetComponent<TMP_InputField>();
+        employeeInfo.text = "";
+        employeeType = inputFields[4].GetComponent<TMP_InputField>();
+        employeeType.text = "";
+        employeeHouse = inputFields[5].GetComponent<TMP_InputField>();
+        employeeHouse.text = "";
+        employeeTeam = inputFields[6].GetComponent<TMP_InputField>();
+        employeeTeam.text = "";
+        employeeRole = inputFields[7].GetComponent<TMP_InputField>();
+        employeeRole.text = "";
+        employeeStatus = inputFields[8].GetComponent<TMP_InputField>();
+        employeeStatus.text = "";
+        hireDate = inputFields[9].GetComponent<TMP_InputField>();
         hireDate.text = "";
         SetButtonPresses();
     }
@@ -27,14 +51,14 @@ public class CreateNewEmployee : MonoBehaviour
     }
     private void GenerateEmployee()
     {
-        string sheetID = writer.AddTabToGoogleSheet(name.text);
-        string range = name.text + "!B3:B5";
+        string sheetID = writer.AddTabToGoogleSheet(employeeName.text);
+        string range = employeeName.text + "!B3:B5";
 
         IList<IList<object>> finalList = new GoogleList<IList<object>>();
         IList<object> nameValue = new GoogleList<object>();
         IList<object> roleValue = new GoogleList<object>();
         IList<object> hireDateValue = new GoogleList<object>();
-        nameValue.Add(name.text);
+        nameValue.Add(employeeName.text);
         roleValue.Add("Team Member"); //Maybe make this a drop down menu with a choice 
         hireDateValue.Add(hireDate.text);
         finalList.Add(nameValue);
@@ -60,14 +84,14 @@ public class CreateNewEmployee : MonoBehaviour
 
         IList<IList<object>> finalList = new GoogleList<IList<object>>();
         IList<object> columnValues = new GoogleList<object>(); //Probably better to just have a single list with each index as one of these values
-        columnValues.Add(GenerateHyperLink(sheetID, name.text));
-        columnValues.Add(""); //email indx 1
-        columnValues.Add(""); //phone index 2 
-        columnValues.Add(""); //additionalInfo index 3
-        columnValues.Add(""); //type index 4, this is part time or full time, better name exists
-        columnValues.Add(""); //house, boh or foh index 5
-        columnValues.Add(""); //team inxex 6
-        columnValues.Add(""); //role inex 7
+        columnValues.Add(GenerateHyperLink(sheetID, employeeName.text));
+        columnValues.Add(employeeEmail.text); //email indx 1
+        columnValues.Add(employeePhone.text); //phone index 2 
+        columnValues.Add(employeeInfo.text); //additionalInfo index 3
+        columnValues.Add(employeeType.text); //type index 4, this is part time or full time, better name exists
+        columnValues.Add(employeeHouse.text); //house, boh or foh index 5
+        columnValues.Add(employeeTeam.text); //team inxex 6
+        columnValues.Add(employeeRole.text); //role inex 7
         columnValues.Add("Active "); //status index 8
         finalList.Add(columnValues);
 
@@ -82,7 +106,7 @@ public class CreateNewEmployee : MonoBehaviour
         body.Values = finalList;
 
         writer.WriteToRange(range, body, true);
-        ManageTrackers.GetComponent<ManageTrackers>().AddNewEmployeeAfterLoad(name.text);
+        ManageTrackers.GetComponent<ManageTrackers>().AddNewEmployeeAfterLoad(employeeName.text);
     }
 
     private string GenerateHyperLink(string sheetID, string label) {
