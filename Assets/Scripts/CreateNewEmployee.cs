@@ -59,12 +59,22 @@ public class CreateNewEmployee : MonoBehaviour
         string range = "MASTER Performance Board!A";
 
         IList<IList<object>> finalList = new GoogleList<IList<object>>();
-        IList<object> nameValue = new GoogleList<object>(); //Can add a bunch of new lists for email and other options
-        nameValue.Add(GenerateHyperLink(sheetID, name.text));
-        finalList.Add(nameValue);
+        IList<object> columnValues = new GoogleList<object>(); //Probably better to just have a single list with each index as one of these values
+        columnValues.Add(GenerateHyperLink(sheetID, name.text));
+        columnValues.Add(""); //email indx 1
+        columnValues.Add(""); //phone index 2 
+        columnValues.Add(""); //additionalInfo index 3
+        columnValues.Add(""); //type index 4, this is part time or full time, better name exists
+        columnValues.Add(""); //house, boh or foh index 5
+        columnValues.Add(""); //team inxex 6
+        columnValues.Add(""); //role inex 7
+        columnValues.Add("Active "); //status index 8
+        finalList.Add(columnValues);
 
         List<List<string>> nameList = writer.GetNames();
         int numNames = nameList[0].Count+nameList[1].Count+3; //Adds the active names, the inactive names, and 3 to get the newest row. 3 because first two rows are not used for names, 1 more because we want the next row
+        range += numNames.ToString();
+        range += ":I"; 
         range += numNames.ToString();
 
         Data.ValueRange body = new Data.ValueRange();

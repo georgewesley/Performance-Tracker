@@ -39,7 +39,7 @@ class SheetsReader : MonoBehaviour
         );
     }
 
-    public IList<Data.ValueRange> getSheetRange(List<string> sheetNameAndRange)
+    public IList<Data.ValueRange> getBatchData(List<string> sheetNameAndRange)
     {
         SpreadsheetsResource.ValuesResource.BatchGetRequest request = service.Spreadsheets.Values.BatchGet(spreadsheetId);
         request.Ranges = sheetNameAndRange;
@@ -64,24 +64,30 @@ class SheetsReader : MonoBehaviour
         range.Add("MASTER Performance Board!A3:A999");
         range.Add("MASTER Performance Board!I3:I999");
         int i = 0;
-        IList<Data.ValueRange> ranges = getSheetRange(range);
+        IList<Data.ValueRange> ranges = getBatchData(range);
         foreach (IList<object> row in ranges[0].Values) {
             //Debug.Log((string)row[0]);
             //Debug.Log(ranges[1].Values[i][0]);
             //Debug.Log((string)ranges[1].Values[i][0] == "Active "); //there is space in active for whatever reason
-            if ((string) ranges[1].Values[i][0] == "Active "){//HR Status
+            //add index out of range exception for when status is left blank below
+            try {
+                if ((string) ranges[1].Values[i][0] == "Active "){//HR Status
+                    names.Add((string)row[0]);
+                } 
+                else {
+                    inactiveNames.Add((string)row[0]);
+                }
+            catch { //if we have an index out of range error it means that it is blank, so we should include it bc it is not inactive
                 names.Add((string)row[0]);
-            } 
-            else {
-                inactiveNames.Add((string)row[0]);
             }
             i++;
         }
+        names.Sort();
         nameList.Add(names);
         nameList.Add(inactiveNames);
         return nameList;
     }
-
+    //should probably change this to batchupdate instead, it would take in a list of requests instead of a string name/range
     public void WriteToRange(string sheetNameAndRange, Data.ValueRange writeText, bool UserEntered = false) { //User entered being true will result in the values being parsed, things like formulas will be applied if this is the case
         int ValueInput = 1;
         if(UserEntered) {

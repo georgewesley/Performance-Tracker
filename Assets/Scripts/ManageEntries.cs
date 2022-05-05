@@ -92,7 +92,7 @@ public class ManageEntries : MonoBehaviour
         List<string> range = new();
         DateTime date = new();
         range.Add(selectedEmployee.sheetName+"!A9:F990");
-        IList<IList<object>> iterate = reader.getSheetRange(range)[0].Values;
+        IList<IList<object>> iterate = reader.getBatchData(range)[0].Values;
         int count = 9; //represents what row we are in, starts at 9 because that is the row above that we start at (on the sheet)
         if(iterate is null)
         {
