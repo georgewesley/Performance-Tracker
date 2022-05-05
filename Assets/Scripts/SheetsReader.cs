@@ -77,9 +77,11 @@ class SheetsReader : MonoBehaviour
                 else {
                     inactiveNames.Add((string)row[0]);
                 }
+            }
             catch { //if we have an index out of range error it means that it is blank, so we should include it bc it is not inactive
                 names.Add((string)row[0]);
             }
+
             i++;
         }
         names.Sort();
