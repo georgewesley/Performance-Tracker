@@ -19,7 +19,7 @@ public class ManageEntries : MonoBehaviour
     private Vector3 DisplayAreaTransform;
     void OnEnable() //if we used start this would happen before trackerManger is even ready to be called
     {
-        DisplayArea = GetComponentInChildren<GridLayoutGroup>().gameObject;
+        DisplayArea = GetComponentInChildren<VerticalLayoutGroup>().gameObject;
         DisplayAreaTransform = DisplayArea.GetComponent<Transform>().position;
         if(DisplayArea.transform.childCount==0)
         {
