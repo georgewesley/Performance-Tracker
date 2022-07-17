@@ -8,40 +8,44 @@ public class CreateNewEmployee : MonoBehaviour
     [SerializeField] GameObject ManageTrackers;
     [SerializeField] GameObject CreateNewEmployeePanel;
     [SerializeField] GameObject[] inputFields;
+    [SerializeField] GameObject[] dropDowns;
     private SheetsReader writer;
     private TMP_InputField employeeName;
     private TMP_InputField employeeEmail;
     private TMP_InputField employeePhone;
-    private TMP_InputField employeeInfo;
-    private TMP_InputField employeeType;
-    private TMP_InputField employeeHouse;
-    private TMP_InputField employeeTeam;
     private TMP_InputField employeeRole;
-    private TMP_InputField employeeStatus;
     private TMP_InputField hireDate;
-    private void OnEnable()
+    private TMP_Dropdown I9;
+    private TMP_Dropdown workPermit;
+    private TMP_Dropdown isMinor;
+    private TMP_Dropdown employeeType;
+    private TMP_Dropdown house;
+    private TMP_Dropdown employeeStatus;
+    private void OnEnable() //we want to reset this screen to its default state
     {
         writer = FindObjectOfType<SheetsReader>();
-        employeeName = inputFields[0].GetComponent<TMP_InputField>();
+        employeeName = inputFields[0].GetComponent<TMP_InputField>(); 
         employeeName.text = "";
         employeeEmail = inputFields[1].GetComponent<TMP_InputField>();
         employeeEmail.text = "";
         employeePhone = inputFields[2].GetComponent<TMP_InputField>();
         employeePhone.text = "";
-        employeeInfo = inputFields[3].GetComponent<TMP_InputField>();
-        employeeInfo.text = "";
-        employeeType = inputFields[4].GetComponent<TMP_InputField>();
-        employeeType.text = "";
-        employeeHouse = inputFields[5].GetComponent<TMP_InputField>();
-        employeeHouse.text = "";
-        employeeTeam = inputFields[6].GetComponent<TMP_InputField>();
-        employeeTeam.text = "";
-        employeeRole = inputFields[7].GetComponent<TMP_InputField>();
+        employeeRole = inputFields[3].GetComponent<TMP_InputField>();
         employeeRole.text = "";
-        employeeStatus = inputFields[8].GetComponent<TMP_InputField>();
-        employeeStatus.text = "";
-        hireDate = inputFields[9].GetComponent<TMP_InputField>();
+        hireDate = inputFields[4].GetComponent<TMP_InputField>();
         hireDate.text = "";
+        I9 = dropDowns[0].GetComponent<TMP_Dropdown>();
+        I9.value = 0; //this should change us to the first option 
+        workPermit = dropDowns[1].GetComponent<TMP_Dropdown>();
+        workPermit.value = 0;
+        isMinor = dropDowns[2].GetComponent<TMP_Dropdown>();
+        isMinor.value = 0;
+        employeeType = dropDowns[3].GetComponent<TMP_Dropdown>();
+        employeeType.value = 0;
+        house = dropDowns[4].GetComponent<TMP_Dropdown>();
+        house.value = 0;
+        employeeStatus = dropDowns[5].GetComponent<TMP_Dropdown>();
+        employeeStatus.value = 0;
         SetButtonPresses();
     }
     private void SetButtonPresses()
@@ -59,7 +63,7 @@ public class CreateNewEmployee : MonoBehaviour
         IList<object> roleValue = new GoogleList<object>();
         IList<object> hireDateValue = new GoogleList<object>();
         nameValue.Add(employeeName.text);
-        roleValue.Add("Team Member"); //Maybe make this a drop down menu with a choice 
+        roleValue.Add(employeeRole.text); //Maybe make this a drop down menu with a choice 
         hireDateValue.Add(hireDate.text);
         finalList.Add(nameValue);
         finalList.Add(roleValue);
@@ -85,20 +89,22 @@ public class CreateNewEmployee : MonoBehaviour
         IList<IList<object>> finalList = new GoogleList<IList<object>>();
         IList<object> columnValues = new GoogleList<object>(); //Probably better to just have a single list with each index as one of these values
         columnValues.Add(GenerateHyperLink(sheetID, employeeName.text));
-        columnValues.Add(employeeEmail.text); //email indx 1
-        columnValues.Add(employeePhone.text); //phone index 2 
-        columnValues.Add(employeeInfo.text); //additionalInfo index 3
-        columnValues.Add(employeeType.text); //type index 4, this is part time or full time, better name exists
-        columnValues.Add(employeeHouse.text); //house, boh or foh index 5
-        columnValues.Add(employeeTeam.text); //team inxex 6
-        columnValues.Add(employeeRole.text); //role inex 7
-        columnValues.Add("Active "); //status index 8
+        columnValues.Add(employeeEmail.text); 
+        columnValues.Add(employeePhone.text); 
+        columnValues.Add(I9.options[I9.value].text); //the reason this works is because I9.value is the currently selected index and we are getting the value of that index, very smart, taken off unity forums
+        columnValues.Add(workPermit.options[workPermit.value].text); 
+        columnValues.Add(isMinor.options[isMinor.value].text); 
+        columnValues.Add(employeeType.options[employeeType.value].text); 
+        columnValues.Add(house.options[house.value].text); 
+        columnValues.Add(employeeRole.text); 
+        columnValues.Add(employeeStatus.options[employeeStatus.value].text); 
+        //hiredate is not included here because it is only visible on the employee's file
         finalList.Add(columnValues);
 
         List<List<string>> nameList = writer.GetNames();
         int numNames = nameList[0].Count+nameList[1].Count+3; //Adds the active names, the inactive names, and 3 to get the newest row. 3 because first two rows are not used for names, 1 more because we want the next row
         range += numNames.ToString();
-        range += ":I"; 
+        range += ":J"; //last column available 
         range += numNames.ToString();
 
         Data.ValueRange body = new Data.ValueRange();

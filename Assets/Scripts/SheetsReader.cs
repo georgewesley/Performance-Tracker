@@ -11,9 +11,9 @@ using UnityEngine;
 
 class SheetsReader : MonoBehaviour
 {
-    static private string spreadsheetId = "1oB6tyA60kQ_IhZeLthKwdRtkdM-rby1AfCIuBst2UsQ";
+    static private string spreadsheetId = "1RXtmd8zTgnOkkWyBJXgkWIwqT1E9ej8DVJGgcSZwkb8";
 
-    static private string serviceAccountID = "unity-performance-tracker@unity-performance-tracker.iam.gserviceaccount.com";
+    static private string serviceAccountID = "performance-tracker@hale-photon-354522.iam.gserviceaccount.com";
     static private SheetsService service;
 
     static SheetsReader()
@@ -62,7 +62,7 @@ class SheetsReader : MonoBehaviour
 
         List<string> range = new();
         range.Add("MASTER Performance Board!A3:A999");
-        range.Add("MASTER Performance Board!I3:I999");
+        range.Add("MASTER Performance Board!J3:J999"); //this should match the range with the ACTIVE or INACTIVE
         int i = 0;
         IList<Data.ValueRange> ranges = getBatchData(range);
         foreach (IList<object> row in ranges[0].Values) {
@@ -71,7 +71,7 @@ class SheetsReader : MonoBehaviour
             //Debug.Log((string)ranges[1].Values[i][0] == "Active "); //there is space in active for whatever reason
             //add index out of range exception for when status is left blank below
             try {
-                if ((string) ranges[1].Values[i][0] == "Active "){//HR Status
+                if ((string) ranges[1].Values[i][0] == "ACTIVE"){//HR Status
                     names.Add((string)row[0]);
                 } 
                 else {
@@ -104,7 +104,7 @@ class SheetsReader : MonoBehaviour
 
     public string AddTabToGoogleSheet(String tabName) { //returns sheet id of new tab
         var duplicateSheetRequest = new Data.DuplicateSheetRequest();
-        duplicateSheetRequest.SourceSheetId = 318664475;
+        duplicateSheetRequest.SourceSheetId = 362286870; //from the template
         duplicateSheetRequest.NewSheetName = tabName;
         Data.BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new Data.BatchUpdateSpreadsheetRequest();
         batchUpdateSpreadsheetRequest.Requests = new List<Data.Request>();
