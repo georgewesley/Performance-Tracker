@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Google.Apis.Sheets.v4.Data;
+using UnityEngine.InputSystem.HID;
+
 public class  ManageTrackers : MonoBehaviour
 {
     public Employees employees;
@@ -124,18 +126,32 @@ public class  ManageTrackers : MonoBehaviour
         DisplayNewEmployee();
     }
 
-    private void DisplayNewEmployee() {
-        PerformanceTracker newTracker = performanceTrackers[performanceTrackers.Count-1];
-        Button newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
-        button.name = newTracker.firstName;
-        TextMeshProUGUI trackerTextMeshPro = button.GetComponentInChildren<TextMeshProUGUI>();
+    private void DisplayNewEmployee()
+    {
+        //Destroy(DisplayArea.transform.Find("New Employee(Clone)")); //this will be a bug if there is something named "New Employee(Clone)" that is not the button
+        //This does not appear to work because of vertical layout, instead we will edit this to be our new employee and add back a new one
+
+        PerformanceTracker newTracker = performanceTrackers[performanceTrackers.Count - 1]; //we just added a new performance tracker so we are getting the last one
+        //Button newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
+        Button oldButton = DisplayArea.transform.Find("New Employee(Clone)").GetComponent<Button>();
+        TextMeshProUGUI trackerTextMeshPro = oldButton.GetComponentInChildren<TextMeshProUGUI>();
         string buttonName = newTracker.firstName;
         if (newTracker.lastName != "") { //if no last name indexing will create an error; indexing empty string is an error
             buttonName = buttonName + " " + newTracker.lastName[0];
         }
+
         trackerTextMeshPro.SetText(buttonName);
-        newButton = Instantiate<Button>(button, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
-        newButton.onClick.AddListener(() => OnEmployeePress(newTracker));
+        oldButton.name = newTracker.firstName;
+        oldButton.onClick.RemoveAllListeners();
+        oldButton.onClick.AddListener(() => OnEmployeePress(newTracker));
+        oldButton.transform.SetParent(DisplayArea.transform, false);
+        
+        //probably can make instantiating this a helper method since it is used twice (here and in initialization)
+        entryButton.name = "New Employee";
+        TextMeshProUGUI newText = entryButton.GetComponentInChildren<TextMeshProUGUI>();
+        newText.SetText("Create New Employee"); //note the newText here instead of trackerTextMeshPro, be careful of which objects you are referencing
+        Button newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
+        newButton.onClick.AddListener(() => CreateEmployeePress());
         newButton.transform.SetParent(DisplayArea.transform, false);
     }
 }
