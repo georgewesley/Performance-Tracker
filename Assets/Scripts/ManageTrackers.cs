@@ -67,7 +67,6 @@ public class  ManageTrackers : MonoBehaviour
 
     void CreateEmployeePress()
     {
-        Debug.Log("We did correct thing");
         GenerateEmployeePanel.SetActive(true);
         ManageTrackersPanel.SetActive(false);
     }

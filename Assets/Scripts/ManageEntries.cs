@@ -12,11 +12,15 @@ public class ManageEntries : MonoBehaviour
     [SerializeField] GameObject ManageEntriesPanel;
     [SerializeField] GameObject EntryPanel;
     public PerformanceEntry selectedPerformanceEntry;
+    public GameObject selectedGameObject;
+    public bool isNewEntry;
+    public Button createNewEntryButton;
+    private Vector3 DisplayAreaTransform;
     private ManageTrackers trackerManager;
     private List<PerformanceEntry> performanceEntries;
     private PerformanceTracker selectedEmployee;
     private GameObject DisplayArea;
-    private Vector3 DisplayAreaTransform;
+    
     void OnEnable() //if we used start this would happen before trackerManger is even ready to be called
     {
         DisplayArea = GetComponentInChildren<VerticalLayoutGroup>().gameObject;
@@ -34,7 +38,6 @@ public class ManageEntries : MonoBehaviour
     {
         entryButton.name = "Back";
         TextMeshProUGUI textMeshPro = entryButton.GetComponentInChildren<TextMeshProUGUI>();
-        TextMeshProUGUI textMeshProEntry = entryButton.GetComponentInChildren<TextMeshProUGUI>();
         textMeshPro.SetText("Go Back");
         Button newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
         newButton.onClick.AddListener(() => OnBackPress());
@@ -43,37 +46,56 @@ public class ManageEntries : MonoBehaviour
         int count = 8; //starts at 8 because 9 is where the rows start on the performance tracker and we do + 1 down below. So in the case where there are 0 current rows we want it to be 8+1. 
         foreach (PerformanceEntry entry in performanceEntries)
         {
-            entryButton.name = entry.category;
-            textMeshProEntry.SetText("Category: " + entry.category + "\n" + "Subcategory: " + entry.subcategory + "\n" + "Leader Name: " + entry.leaderName + "\n" + "Date: " + entry.entryDate.Day+"/"+entry.entryDate.Month+"/"+entry.entryDate.Year
-            + "\n\n" + entry.textDescription);
-            newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
-            newButton.onClick.AddListener(() => OnEntryPress(entry));
-            // SetEntryText(newButton, entry, entryDisplayTransform);
-            newButton.transform.SetParent(DisplayArea.transform, false);
+            CreateEntryButton(entry);
             count += 1;
         }
-        textMeshPro.SetText("New Entry");
-        newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
-        PerformanceEntry performanceEntry = new()
-        {
-            entryDate = DateTime.Now,
-            textDescription = "",
-            category = "",
-            subcategory = "",
-            leaderName = "",
-            row = count+1
-        };
-        newButton.onClick.AddListener(() => OnEntryPress(performanceEntry));
-        newButton.transform.SetParent(DisplayArea.transform, false);
+        CreateNewEntryButton(count+1); 
     }
 
-    
-    void OnEntryPress(PerformanceEntry entry)
-    {
-        selectedPerformanceEntry = entry;
-        EntryPanel.SetActive(true);
-        ManageEntriesPanel.SetActive(false);
-    }
+        public Button CreateNewEntryButton(int rowForEntry)
+        {
+            TextMeshProUGUI textMeshPro = entryButton.GetComponentInChildren<TextMeshProUGUI>();
+            textMeshPro.SetText("New Entry");
+            createNewEntryButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
+            PerformanceEntry performanceEntry = new()
+            {
+                entryDate = DateTime.Now,
+                textDescription = "",
+                category = "",
+                subcategory = "",
+                leaderName = "",
+                row = rowForEntry
+            };
+            //below line must not occur at the start of this method because that is before it is declared and will result in null referance
+            createNewEntryButton.onClick.RemoveAllListeners(); //this should reset the listeners so that only the current ones are used
+            createNewEntryButton.onClick.AddListener(() => OnEntryPress(performanceEntry, createNewEntryButton.gameObject));
+            createNewEntryButton.transform.SetParent(DisplayArea.transform, false);
+            return createNewEntryButton;
+        }
+
+        public Transform CreateEntryButton(PerformanceEntry entry)
+        {
+            Debug.Log("I Created an Entry!! Wow wow wow");
+            var textMeshProEntry = entryButton.GetComponentInChildren<TextMeshProUGUI>();
+            entryButton.name = entry.category;
+            textMeshProEntry.SetText("Category: " + entry.category + "\n" + "Subcategory: " + entry.subcategory + "\n" + "Leader Name: " + entry.leaderName + "\n" + "Date: " + entry.entryDate.Day+"/"+entry.entryDate.Month+"/"+entry.entryDate.Year
+                                     + "\n\n" + entry.textDescription);
+            var newButton = Instantiate<Button>(entryButton, new Vector3(DisplayAreaTransform.x, DisplayAreaTransform.y, DisplayAreaTransform.z), Quaternion.identity);
+            newButton.onClick.AddListener(() => OnEntryPress(entry, newButton.gameObject, false)); //we are not saying that this is not a new button, it is, we are saying that when we press this button it will not create a new entry
+            // SetEntryText(newButton, entry, entryDisplayTransform);
+            newButton.transform.SetParent(DisplayArea.transform, false);
+            return newButton.transform;
+        }
+
+
+        void OnEntryPress(PerformanceEntry entry, GameObject button, bool newEntry = true)
+        {
+            isNewEntry = newEntry; 
+            selectedPerformanceEntry = entry;
+            selectedGameObject = button;
+            EntryPanel.SetActive(true);
+            ManageEntriesPanel.SetActive(false);
+        }
 
     void OnBackPress() {
         ManageTrackersPanel.SetActive(true); //Temporarily here, will move to back button (that goes back to main menu)
