@@ -23,7 +23,7 @@ public class CreateNewEmployee : MonoBehaviour
     private TMP_Dropdown employeeStatus;
     private void OnEnable() //we want to reset this screen to its default state
     {
-        writer = FindObjectOfType<SheetsReader>();
+        writer = new SheetsReader();
         employeeName = inputFields[0].GetComponent<TMP_InputField>(); 
         employeeName.text = "";
         employeeEmail = inputFields[1].GetComponent<TMP_InputField>();

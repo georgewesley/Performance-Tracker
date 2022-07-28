@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-
+using System.Runtime.CompilerServices;
 using Google.Apis.Services;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Sheets.v4;
@@ -48,14 +48,11 @@ class SheetsReader : MonoBehaviour
         {
             return response.ValueRanges; //[0].Values of this returns the values of first range
         }
-        else
-        {
-            Debug.Log("No data found.");
-            return null;
-        }
+        Debug.Log("No data found.");
+        return null;
     }
 
-    public List<List<string>> GetNames() {
+    public List<List<string>> GetNames() { //maybe this should be in manage trackers
         List<List<string>> nameList = new();
         List<string> names = new();
         List<string> inactiveNames = new();
