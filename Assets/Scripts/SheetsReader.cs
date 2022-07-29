@@ -52,7 +52,7 @@ class SheetsReader : MonoBehaviour
         return null;
     }
 
-    public List<List<string>> GetNames() { //maybe this should be in manage trackers
+    public List<List<string>> GetNames() { //maybe this should be in manage trackers, although I can think of many different places we may need to get the names from the main page
         List<List<string>> nameList = new();
         List<string> names = new();
         List<string> inactiveNames = new();

@@ -157,6 +157,7 @@ public class WriteEntry : MonoBehaviour
         }
         _newEntryButton = _manageEntries.CreateEntryButton(_performanceEntry);
         _createEntryButton.transform.SetAsLastSibling();
+        OnBackPress();
     }
 
     IList<IList<object>> GenerateValues() {

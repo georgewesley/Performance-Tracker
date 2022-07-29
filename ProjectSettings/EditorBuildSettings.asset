@@ -8,13 +8,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Menu.unity
     guid: 2cda990e2423bbf4892e6590ba056729
-  - enabled: 1
-    path: Assets/Scenes/Performance.unity
-    guid: b4fc04d513c5b6a4aa79a01ff43a9a44
-  - enabled: 1
-    path: Assets/Scenes/Lineup.unity
-    guid: 36eb70d420c34994abc90d510bfdec5c
-  - enabled: 1
-    path: Assets/Scenes/Breaks.unity
-    guid: 434ece4adfc0a25478519588445b1b93
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
   m_configObjects: {}
