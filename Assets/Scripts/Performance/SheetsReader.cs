@@ -18,6 +18,8 @@ class SheetsReader : MonoBehaviour
 
     static SheetsReader()
     {
+        string key = "";
+
 
         // Creating a  ServiceAccountCredential.Initializer
         // ref: https://googleapis.dev/dotnet/Google.Apis.Auth/latest/api/Google.Apis.Auth.OAuth2.ServiceAccountCredential.Initializer.html
