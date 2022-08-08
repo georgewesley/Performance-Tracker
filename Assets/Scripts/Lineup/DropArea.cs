@@ -20,5 +20,6 @@ public class DropArea : MonoBehaviour
     public void SetNumPositions(int numPositions)
     {
         _numPositions = numPositions;
+        
     }
 }
