@@ -5,7 +5,7 @@ using System;
 
 
 [Serializable]
-public class PerformanceTracker
+public class PerformanceTracker //Consider making firstName lastName an employee object that is shared between other parts of the program
 {
     public string firstName;
     public string lastName;// {get; set;}
