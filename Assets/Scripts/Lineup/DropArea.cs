@@ -6,37 +6,30 @@ using UnityEngine;
 
 public class DropArea : MonoBehaviour
 {
-    private int _numPositions;
-    private List<GameObject> _currentTeamMembers;
+    private GameObject _currentTeamMember;
     public Vector2 originalPosition;
+    public GameObject originalDropArea;
+    //need a reference to the "ultimate parent", if this is a reference to itself we know it is the ultimate parent
 
     private void Awake()
     {
         originalPosition = gameObject.transform.position;
-        _currentTeamMembers = new List<GameObject>();
-        _numPositions = 1; //will always start with one position, may need to change this if saving and loading data
+        _currentTeamMember = null;
         SetPositionName("Test123");
-    }
-
-    public void SetNumPositions(int numPositions)
-    {
-        ChangeNumberOfAreas(numPositions - _numPositions);
-        _numPositions = numPositions;
-    }
-
-    public int GetNumPositions()
-    {
-        return _numPositions;
+        originalDropArea = gameObject.transform.parent.CompareTag("DropArea") ? 
+            gameObject.transform.parent.GetComponent<DropArea>().originalDropArea : gameObject;
     }
 
     public void AddTeamMember(GameObject teamMember) //this should never be called from anywhere except LineUpTeamMember
     {
-        _currentTeamMembers.Add(teamMember);
+        _currentTeamMember = teamMember;
+        teamMember.transform.SetParent(gameObject.transform);
     }
 
     public void RemoveTeamMember(GameObject teamMember) //this should never be called from anywhere except LineUpTeamMember
     {
-        _currentTeamMembers.Remove(teamMember);
+        _currentTeamMember = null;
+        teamMember.transform.SetParent(originalDropArea.transform.parent);
     }
 
     public void SetPositionName(string name)
@@ -44,13 +37,8 @@ public class DropArea : MonoBehaviour
         gameObject.GetComponentInChildren<TextMeshProUGUI>().SetText(name);
     }
 
-    public List<GameObject> GetTeamMembers()
+    public GameObject GetTeamMember()
     {
-        return _currentTeamMembers;
-    }
-
-    private void ChangeNumberOfAreas(int numberToChange) //sometimes this will be negative or positive which is what tells us to add or remove
-    {
-        
+        return _currentTeamMember;
     }
 }

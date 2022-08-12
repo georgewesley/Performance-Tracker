@@ -14,7 +14,7 @@ public class PotentialDropArea : MonoBehaviour
     
     private void OnPress()
     {
-        //Now am removing in DragController, keeping this here just incase
+        //Now am removing in DragController, keeping this here just encase
         /*gameObject.transform.SetAsFirstSibling(); 
         for (int i = 1; i < gameObject.transform.parent.childCount; i++) //delete all the other buttons 
         {

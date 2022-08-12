@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Image = UnityEngine.UIElements.Image;
+using Object = System.Object;
 
 public class DragController : MonoBehaviour //need a feature to store templates of where objects are
 {
@@ -119,41 +120,29 @@ public class DragController : MonoBehaviour //need a feature to store templates 
     {
         Debug.Log("New Drag");
         _dragActive = true;
-        _lastDragged.transform.SetAsLastSibling();// We do this so it is always on top.
         if(_lastDragged.GetComponent<LineUpTeamMember>() != null)
         {
+            _lastDragged.transform.SetAsLastSibling();// We do this so it is always on top.
             LineUpTeamMember lineUpTeamMember = _lastDragged.GetComponent<LineUpTeamMember>();
             lineUpTeamMember.originalPosition = lineUpTeamMember.GetCurrentPosition();
             _lastDropArea = lineUpTeamMember.RemoveLastDropArea();
         }
-        else //this is if _lastDragged is a DropArea, we want to make sure that all of the teamMembers stay on top of the position 
+        else //this is if _lastDragged is a DropArea, we need to put the original parent on top and record the position of the original parent just encase we make an invalid move
         {
-            foreach (GameObject teamMember in _lastDragged.GetComponent<DropArea>().GetTeamMembers())
-            {
-                teamMember.transform.SetAsLastSibling();
-            }
+            DropArea tempDropArea = _lastDragged.GetComponent<DropArea>();
+            tempDropArea.originalDropArea.transform.SetAsLastSibling();
+            DropArea tempOriginalDropArea = tempDropArea.originalDropArea.GetComponent<DropArea>();
+            tempOriginalDropArea.originalPosition = tempOriginalDropArea.transform.position;
         }
     }
     void Drag()
     {
         Debug.Log("Drag");
-        Vector3 tempLocalPosition = _lastDragged.transform.localPosition; //without this using _lastDragged.transform.localPosition below will cause bug
         if (_lastDragged.CompareTag("DropArea"))
         {
-            foreach (GameObject teamMember in _lastDragged.GetComponent<DropArea>().GetTeamMembers()) //going to need to do recursion to move every person
-            {
-                teamMember.gameObject.transform.position = Input.mousePosition;
-            }
-            if (_lastDragged.transform.parent.CompareTag("DropArea")) //move parent instead, child will move with
-            {
-                Debug.Log("Parent should be: " + _lastDragged.name);
-                _lastDragged.transform.parent.position =
-                    Input.mousePosition - tempLocalPosition; 
-            }
-            else
-            {
-                _lastDragged.gameObject.transform.position = Input.mousePosition;
-            }
+            DropArea tempDropArea = _lastDragged.GetComponent<DropArea>();
+            Vector3 tempLocalPosition = tempDropArea.originalDropArea.transform.position - _lastDragged.transform.position; //should be 0 when it is original, should give offset if not
+            tempDropArea.originalDropArea.transform.position = Input.mousePosition + tempLocalPosition;
         }
         else
         {
@@ -176,11 +165,10 @@ public class DragController : MonoBehaviour //need a feature to store templates 
             if(!_lastDragged.gameObject.CompareTag("DropArea")) //This means that we are currently holding a non-DropArea
             {
                 DropArea dropArea = potentialDropArea.GetComponent<DropArea>();
-                if (dropArea.GetNumPositions() <= dropArea.GetTeamMembers().Count) //If there is someone in there, we need to swap them
+                if (dropArea.GetTeamMember() != null) //If there is someone in there, we need to swap them
                 {
-                    GameObject teamMember = dropArea.GetTeamMembers()[0];
-                    teamMember.transform.SetAsLastSibling(); //need to make sure it appears on the top!
-                    
+                    GameObject teamMember = dropArea.GetTeamMember();
+
                     LineUpTeamMember lineUpTeamMember = teamMember.GetComponent<LineUpTeamMember>();
                     lineUpTeamMember.RemoveLastDropArea(); //this auto-removes them from the dropArea as well
                     teamMember.transform.position = _lastDragged.GetComponent<LineUpTeamMember>().originalPosition;
@@ -189,7 +177,7 @@ public class DragController : MonoBehaviour //need a feature to store templates 
                         lineUpTeamMember.SetLastDropArea(_lastDropArea);
                     }
                 }
-                _newPosition = potentialDropArea.transform.position;
+                _lastDragged.transform.position = potentialDropArea.transform.position;
                 _lastDragged.GetComponent<LineUpTeamMember>().SetLastDropArea(potentialDropArea);
             }
             else //this means that we are trying to drop a DropArea, need to check if what is below is acceptable
@@ -198,16 +186,11 @@ public class DragController : MonoBehaviour //need a feature to store templates 
                 if (!ReferenceEquals(_lastDragged, potentialDropArea))
                 {
                     DropArea localDropArea = _lastDragged.GetComponent<DropArea>();
-                    _newPosition = localDropArea.originalPosition;
-                    foreach (GameObject teamMember in localDropArea.GetTeamMembers())
-                    {
-                        teamMember.transform.position = localDropArea.originalPosition;
-                    }
+                    localDropArea.originalDropArea.transform.position =
+                        localDropArea.originalDropArea.GetComponent<DropArea>().originalPosition;
                 }
             }
-
             _lastDropArea = null; //reset because we are no longer dragging anything, lastDropArea is only relevant to the current _lastDrag object
-            _lastDragged.transform.position = _newPosition;
         }
         
     }
