@@ -14,6 +14,7 @@ public class PerformanceTracker //Consider making firstName lastName an employee
     public List<PerformanceEntry> performanceEntries;//{get; set;}
 
     public void CreatePerformanceEntry(DateTime date, string text, string category, string subcategory, string leader)
+    //I think this code is extra, I do not see it used
     {
         PerformanceEntry performance = new PerformanceEntry
         {

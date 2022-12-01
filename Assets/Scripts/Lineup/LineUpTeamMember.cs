@@ -37,7 +37,7 @@ public class LineUpTeamMember : MonoBehaviour
             _lastDropArea.GetComponent<DropArea>().RemoveTeamMember(gameObject); //removes self from the last game object
             _lastDropArea = null;
         }
-        return lastDropArea;
+        return lastDropArea; //for swapping, we need to know what last drop area was if we are swapping two team members
     }
 
     public Vector2 GetCurrentPosition()

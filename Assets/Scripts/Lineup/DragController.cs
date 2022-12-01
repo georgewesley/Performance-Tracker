@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -19,9 +20,10 @@ public class DragController : MonoBehaviour //need a feature to store templates 
     private bool _edit;
     private bool _potentialsDisplayed;
     private List<GameObject> _potentialDropAreaList;
-    [SerializeField] private GameObject potentialDropArea;
+    [SerializeField] private GameObject dropAreaPrefab;
+    [SerializeField] private GameObject teamMemberViewport;
     
-    void Awake()
+    private void Awake()
     {
         _raycaster = gameObject.GetComponent<GraphicRaycaster>();
         _potentialDropAreaList = new List<GameObject>();
@@ -29,7 +31,7 @@ public class DragController : MonoBehaviour //need a feature to store templates 
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (Input.touchCount > 0)
         {
@@ -86,13 +88,13 @@ public class DragController : MonoBehaviour //need a feature to store templates 
                         if (!_potentialsDisplayed)
                         {
                             _potentialsDisplayed = true;
-                            _potentialDropAreaList.Add(Instantiate(potentialDropArea, _lastDragged.transform, false)); 
+                            _potentialDropAreaList.Add(Instantiate(dropAreaPrefab, _lastDragged.transform, false)); 
                             _potentialDropAreaList[0].transform.localPosition = new Vector2(-170, 0);
-                            _potentialDropAreaList.Add(Instantiate(potentialDropArea, _lastDragged.transform, false)); 
+                            _potentialDropAreaList.Add(Instantiate(dropAreaPrefab, _lastDragged.transform, false)); 
                             _potentialDropAreaList[1].transform.localPosition = new Vector2(170, 0);
-                            _potentialDropAreaList.Add(Instantiate(potentialDropArea, _lastDragged.transform, false)); 
+                            _potentialDropAreaList.Add(Instantiate(dropAreaPrefab, _lastDragged.transform, false)); 
                             _potentialDropAreaList[2].transform.localPosition = new Vector2(0, -170);
-                            _potentialDropAreaList.Add(Instantiate(potentialDropArea, _lastDragged.transform, false)); 
+                            _potentialDropAreaList.Add(Instantiate(dropAreaPrefab, _lastDragged.transform, false)); 
                             _potentialDropAreaList[3].transform.localPosition = new Vector2(0, 170);
                         }
                         //should pop up four PotentialDropArea buttons that we will then press to create an actual DropArea
@@ -116,13 +118,14 @@ public class DragController : MonoBehaviour //need a feature to store templates 
         }
     }
 
-    void NewDrag()
+    private void NewDrag()
     {
         Debug.Log("New Drag");
         _dragActive = true;
         if(_lastDragged.GetComponent<LineUpTeamMember>() != null)
         {
-            _lastDragged.transform.SetAsLastSibling();// We do this so it is always on top.
+            _lastDragged.transform.SetParent(teamMemberViewport.transform); //whenever we pick up a team member we want them to be in the team member list
+            _lastDragged.transform.SetAsLastSibling(); // We do this so it is always on top.
             LineUpTeamMember lineUpTeamMember = _lastDragged.GetComponent<LineUpTeamMember>();
             lineUpTeamMember.originalPosition = lineUpTeamMember.GetCurrentPosition();
             _lastDropArea = lineUpTeamMember.RemoveLastDropArea();
@@ -135,7 +138,7 @@ public class DragController : MonoBehaviour //need a feature to store templates 
             tempOriginalDropArea.originalPosition = tempOriginalDropArea.transform.position;
         }
     }
-    void Drag()
+    private void Drag()
     {
         Debug.Log("Drag");
         if (_lastDragged.CompareTag("DropArea"))
@@ -149,7 +152,7 @@ public class DragController : MonoBehaviour //need a feature to store templates 
             _lastDragged.gameObject.transform.position = Input.mousePosition;
         }
     }
-    void Drop()
+    private void Drop()
     {
         Debug.Log("Drop");
         _dragActive = false;
@@ -159,40 +162,11 @@ public class DragController : MonoBehaviour //need a feature to store templates 
         _raycaster.Raycast(ped,results);
         GameObject potentialDropArea = results[^3].gameObject; //should always be the third last object, last is LineUpPanel, second last is Viewport
         Debug.Log(potentialDropArea.name);
-        if (potentialDropArea.CompareTag("DropArea")) //possibly move everything below this into it's own function, also we must make sure we are not looking at the same object we are currently dragging 
+        if (potentialDropArea.CompareTag("DropArea")) 
         {
-            Vector2 _newPosition = _screenPosition;
-            if(!_lastDragged.gameObject.CompareTag("DropArea")) //This means that we are currently holding a non-DropArea
-            {
-                DropArea dropArea = potentialDropArea.GetComponent<DropArea>();
-                if (dropArea.GetTeamMember() != null) //If there is someone in there, we need to swap them
-                {
-                    GameObject teamMember = dropArea.GetTeamMember();
-
-                    LineUpTeamMember lineUpTeamMember = teamMember.GetComponent<LineUpTeamMember>();
-                    lineUpTeamMember.RemoveLastDropArea(); //this auto-removes them from the dropArea as well
-                    teamMember.transform.position = _lastDragged.GetComponent<LineUpTeamMember>().originalPosition;
-                    if (_lastDropArea != null) //this means we are swapping two objects
-                    {
-                        lineUpTeamMember.SetLastDropArea(_lastDropArea);
-                    }
-                }
-                _lastDragged.transform.position = potentialDropArea.transform.position;
-                _lastDragged.GetComponent<LineUpTeamMember>().SetLastDropArea(potentialDropArea);
-            }
-            else //this means that we are trying to drop a DropArea, need to check if what is below is acceptable
-            {
-                //We know the _lastDragged and potentialDropArea both have the DropArea tag, we want to see if they are the same. If they are, we are fine placing it. If they are not, we need to shunt which is what this if statement is for
-                if (!ReferenceEquals(_lastDragged, potentialDropArea))
-                {
-                    DropArea localDropArea = _lastDragged.GetComponent<DropArea>();
-                    localDropArea.originalDropArea.transform.position =
-                        localDropArea.originalDropArea.GetComponent<DropArea>().originalPosition;
-                }
-            }
-            _lastDropArea = null; //reset because we are no longer dragging anything, lastDropArea is only relevant to the current _lastDrag object
+            DropInDropArea(potentialDropArea);
         }
-        
+        //if it is not a drop area, turning _dragActive to false is all we really have to do
     }
     private void DestroyPotentials(GameObject protectedPotential)
     {
@@ -218,5 +192,41 @@ public class DragController : MonoBehaviour //need a feature to store templates 
             _potentialsDisplayed = false;
             _potentialDropAreaList = new List<GameObject>();
         }
+    }
+
+    private void DropInDropArea(GameObject potentialDropArea)
+    { 
+        if(!_lastDragged.gameObject.CompareTag("DropArea")) //This means that we are currently holding a non-DropArea
+        {
+            DropArea dropArea = potentialDropArea.GetComponent<DropArea>();
+            if (dropArea.GetTeamMember() != null) //If there is someone in there, we need to swap them
+            {
+                GameObject teamMember = dropArea.GetTeamMember(); //gets team member that is currently in dropArea (the one we are going to replace with our _lastDragged)
+                LineUpTeamMember lineUpTeamMember = teamMember.GetComponent<LineUpTeamMember>();
+                lineUpTeamMember.RemoveLastDropArea(); //this auto-removes them from the dropArea as well
+                teamMember.transform.position = _lastDragged.GetComponent<LineUpTeamMember>().originalPosition;
+                if (_lastDropArea != null) //this means we are swapping between two dropAreas
+                {
+                    lineUpTeamMember.SetLastDropArea(_lastDropArea);
+                }
+                else
+                {
+                    teamMember.transform.SetParent(teamMemberViewport.transform); //if we are swapping between a team member that has no dropArea and one that does, we need to move the one formally in dropArea back to the team member list
+                }
+            }
+            _lastDragged.transform.position = potentialDropArea.transform.position;
+            _lastDragged.GetComponent<LineUpTeamMember>().SetLastDropArea(potentialDropArea);
+        }
+        else //this means that we are trying to drop a DropArea, need to check if what is below is acceptable
+        {
+            //We know the _lastDragged and potentialDropArea both have the DropArea tag, we want to see if they are the same. If they are, we are fine placing it. If they are not, we need to shunt which is what this if statement is for
+            if (!ReferenceEquals(_lastDragged, potentialDropArea))
+            {
+                DropArea localDropArea = _lastDragged.GetComponent<DropArea>();
+                localDropArea.originalDropArea.transform.position =
+                    localDropArea.originalDropArea.GetComponent<DropArea>().originalPosition;
+            }
+        }
+        _lastDropArea = null; //reset because we are no longer dragging anything, lastDropArea is only relevant to the current _lastDrag object    
     }
 }

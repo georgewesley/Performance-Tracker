@@ -17,6 +17,8 @@ public class WriteEntry : MonoBehaviour
     [SerializeField] GameObject WriteEntryPanel;
     [SerializeField] GameObject[] inputFields;
     [SerializeField] private GameObject[] dropDowns;
+    [SerializeField] private GameObject saveButtonObject;
+    [SerializeField] private GameObject backButtonObject;
     private PerformanceEntry _performanceEntry;
     private Transform _createEntryButton;
     private GameObject _lastEntryButton;
@@ -32,8 +34,8 @@ public class WriteEntry : MonoBehaviour
     void Awake() //We put these in start not in enable because they only happen once
     //note that start happens after enable??? That is why we use Awake() here
     {
-        Button saveButton = WriteEntryPanel.transform.Find("Save Button").GetComponent<Button>();
-        Button backButton = WriteEntryPanel.transform.Find("Back Button").GetComponent<Button>();
+        Button saveButton = saveButtonObject.GetComponent<Button>();
+        Button backButton = backButtonObject.GetComponent<Button>();
         saveButton.onClick.AddListener(() => SaveFields());
         backButton.onClick.AddListener(() => OnBackPress());
         _sheetsReader = FindObjectOfType<SheetsReader>();

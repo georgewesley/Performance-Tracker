@@ -16,20 +16,19 @@ public class DropArea : MonoBehaviour
         originalPosition = gameObject.transform.position;
         _currentTeamMember = null;
         SetPositionName("Test123");
-        originalDropArea = gameObject.transform.parent.CompareTag("DropArea") ? 
-            gameObject.transform.parent.GetComponent<DropArea>().originalDropArea : gameObject;
+        originalDropArea = gameObject.transform.parent.CompareTag("DropArea") ? gameObject.transform.parent.GetComponent<DropArea>().originalDropArea : gameObject;
+        //above line determines whether this is a DropArea with parents or if it is a DropArea that has no DropArea parent
     }
 
     public void AddTeamMember(GameObject teamMember) //this should never be called from anywhere except LineUpTeamMember
     {
         _currentTeamMember = teamMember;
-        teamMember.transform.SetParent(gameObject.transform);
+        teamMember.transform.SetParent(gameObject.transform); //this operation should occur in TeamMemberManager instead or maybe DragController
     }
 
     public void RemoveTeamMember(GameObject teamMember) //this should never be called from anywhere except LineUpTeamMember
     {
         _currentTeamMember = null;
-        teamMember.transform.SetParent(originalDropArea.transform.parent);
     }
 
     public void SetPositionName(string name)
@@ -40,5 +39,14 @@ public class DropArea : MonoBehaviour
     public GameObject GetTeamMember()
     {
         return _currentTeamMember;
+    }
+
+    private GameObject RecursiveOriginalDropArea(GameObject dropArea) //this does not work
+    {
+        if (dropArea.transform.parent.CompareTag("DropArea"))
+        {
+            return RecursiveOriginalDropArea(gameObject.transform.parent.gameObject);
+        }
+        return gameObject;
     }
 }
